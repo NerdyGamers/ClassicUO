@@ -207,6 +207,9 @@
   <data name="EnablePathfinding" xml:space="preserve">
     <value>Enable pathfinding</value>
   </data>
+  <data name="EnableMinimapPathfinding" xml:space="preserve">
+    <value>Enable minimap pathfinding</value>
+  </data>
   <data name="FPSInactive" xml:space="preserve">
     <value>Reduce FPS when game is inactive</value>
   </data>

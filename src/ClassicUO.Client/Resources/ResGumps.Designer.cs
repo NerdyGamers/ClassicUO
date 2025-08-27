@@ -1492,6 +1492,15 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("EnablePathfinding", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable minimap pathfinding.
+        /// </summary>
+        public static string EnableMinimapPathfinding {
+            get {
+                return ResourceManager.GetString("EnableMinimapPathfinding", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Enemy Color.

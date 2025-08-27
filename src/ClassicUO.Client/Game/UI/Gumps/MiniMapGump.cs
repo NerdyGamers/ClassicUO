@@ -11,6 +11,7 @@ using ClassicUO.IO;
 using ClassicUO.Assets;
 using ClassicUO.Renderer;
 using ClassicUO.Utility;
+using ClassicUO.Configuration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.CompilerServices;
@@ -32,6 +33,10 @@ namespace ClassicUO.Game.UI.Gumps
         private bool _useLargeMap;
         private ushort _x, _y;
         private static readonly uint[][] _blankGumpsPixels = new uint[4][];
+        /// <summary>
+        /// Holds the computed path to render on the minimap while auto-walking.
+        /// </summary>
+        private Point[] _path;
 
         const ushort SMALL_MAP_GRAPHIC = 5010;
         const ushort BIG_MAP_GRAPHIC = 5011;
@@ -143,11 +148,11 @@ namespace ClassicUO.Game.UI.Gumps
 
             batcher.Draw(gumpInfo.Texture, new Vector2(x, y), gumpInfo.UV, hueVector);
 
+            int w = Width >> 1;
+            int h = Height >> 1;
+
             if (_draw)
             {
-                int w = Width >> 1;
-                int h = Height >> 1;
-
                 Texture2D mobilesTextureDot = SolidColorTextureCache.GetTexture(Color.Red);
 
                 foreach (Mobile mob in World.Mobiles.Values)
@@ -184,6 +189,54 @@ namespace ClassicUO.Game.UI.Gumps
                 );
             }
 
+            if (_path != null)
+            {
+                // Draw the remaining path segments and destination while autowalking.
+                if (World.Player.Pathfinder.AutoWalking)
+                {
+                    Vector3 pathHue = ShaderHueTranslator.GetHueVector(0);
+                    Texture2D lineTexture = SolidColorTextureCache.GetTexture(Color.Yellow);
+                    Texture2D pinTexture = SolidColorTextureCache.GetTexture(Color.Red);
+                    int startIndex = World.Player.Pathfinder.CurrentPathNode;
+
+                    for (int i = Math.Max(startIndex, 0); i < _path.Length - 1; i++)
+                    {
+                        Point p0 = _path[i];
+                        Point p1 = _path[i + 1];
+
+                        int px0 = p0.X - World.Player.X + w;
+                        int py0 = p0.Y - World.Player.Y;
+                        int gx0 = px0 - py0;
+                        int gy0 = px0 + py0;
+
+                        int px1 = p1.X - World.Player.X + w;
+                        int py1 = p1.Y - World.Player.Y;
+                        int gx1 = px1 - py1;
+                        int gy1 = px1 + py1;
+
+                        batcher.DrawLine(
+                            lineTexture,
+                            new Vector2(x + gx0, y + gy0),
+                            new Vector2(x + gx1, y + gy1),
+                            pathHue,
+                            1
+                        );
+                    }
+
+                    Point dest = _path[_path.Length - 1];
+                    int pdx = dest.X - World.Player.X + w;
+                    int pdy = dest.Y - World.Player.Y;
+                    int pgx = pdx - pdy;
+                    int pgy = pdx + pdy;
+
+                    batcher.Draw(pinTexture, new Rectangle(x + pgx - 2, y + pgy - 2, 4, 4), pathHue);
+                }
+                else
+                {
+                    _path = null;
+                }
+            }
+
             return base.Draw(batcher, x, y);
         }
 
@@ -197,6 +250,48 @@ namespace ClassicUO.Game.UI.Gumps
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Starts pathfinding when the user Ctrl+Left-clicks the minimap.
+        /// </summary>
+        protected override void OnMouseUp(int x, int y, MouseButtonType button)
+        {
+            base.OnMouseUp(x, y, button);
+
+            if (
+                button == MouseButtonType.Left
+                && Keyboard.Ctrl
+                && ProfileManager.CurrentProfile.EnableMiniMapPathfinding
+            )
+            {
+                if (TryGetWorldPoint(x, y, out ushort wx, out ushort wy))
+                {
+                    sbyte z = World.Map.GetTileZ(wx, wy);
+
+                    if (World.Player.Pathfinder.WalkTo(wx, wy, z, 0))
+                    {
+                        _path = new Point[World.Player.Pathfinder.PathSize];
+                        World.Player.Pathfinder.CopyPath(_path);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Translates a minimap click position into world coordinates.
+        /// </summary>
+        private bool TryGetWorldPoint(int x, int y, out ushort worldX, out ushort worldY)
+        {
+            int centerX = Width >> 1;
+            int centerY = Height >> 1;
+            int px = (x + y) >> 1;
+            int py = (y - x) >> 1;
+
+            worldX = (ushort)(px - centerX + World.Player.X);
+            worldY = (ushort)(py + World.Player.Y);
+
+            return true;
         }
 
         protected override void UpdateContents()

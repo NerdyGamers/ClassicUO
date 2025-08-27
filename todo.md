@@ -13,8 +13,8 @@
 
 ## Minimap Pathfinding Autowalk
 
-- [ ] Detect `Ctrl + Left Click` on the minimap in `MiniMapGump` and map click position to world coordinates.
-- [ ] Use `Pathfinder` to compute a route and trigger auto-walking to the selected location.
-- [ ] Draw a destination pin and visual path on the minimap while walking.
-- [ ] Clear the pin and path once the player arrives or pathfinding is cancelled.
-- [ ] Add a profile option to enable or disable minimap pathfinding.
+- [x] Detect `Ctrl + Left Click` on the minimap in `MiniMapGump` and map click position to world coordinates.
+- [x] Use `Pathfinder` to compute a route and trigger auto-walking to the selected location.
+- [x] Draw a destination pin and visual path on the minimap while walking.
+- [x] Clear the pin and path once the player arrives or pathfinding is cancelled.
+- [x] Add a profile option to enable or disable minimap pathfinding.
