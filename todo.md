@@ -10,3 +10,11 @@
 - [ ] Clarify usage of `r.x1` in `RenderedText.cs`
 - [ ] Remove obsolete `MovePlayer` macro path in `MacroManager.cs`
 - [ ] Evaluate redundant `GameObject` fields flagged as FIXME
+
+## Minimap Pathfinding Autowalk
+
+- [ ] Detect `Ctrl + Left Click` on the minimap in `MiniMapGump` and map click position to world coordinates.
+- [ ] Use `Pathfinder` to compute a route and trigger auto-walking to the selected location.
+- [ ] Draw a destination pin and visual path on the minimap while walking.
+- [ ] Clear the pin and path once the player arrives or pathfinding is cancelled.
+- [ ] Add a profile option to enable or disable minimap pathfinding.
