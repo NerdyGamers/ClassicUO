@@ -75,6 +75,10 @@ namespace ClassicUO.Configuration
 
         [JsonPropertyName("login_music_volume")] public int LoginMusicVolume { get; set; } = 70;
 
+        [JsonPropertyName("login_wallpaper_animated")] public bool LoginWallpaperAnimated { get; set; } = false;
+
+        [JsonPropertyName("login_wallpaper_frame_delay")] public int LoginWallpaperFrameDelay { get; set; } = 150;
+
         [JsonPropertyName("fixed_time_step")] public bool FixedTimeStep { get; set; } = true;
 
         [JsonPropertyName("run_mouse_in_separate_thread")]

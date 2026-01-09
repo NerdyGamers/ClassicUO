@@ -1,5 +1,6 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
+using ClassicUO.Configuration;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Utility;
 
@@ -11,36 +12,78 @@ namespace ClassicUO.Game.UI.Gumps.Login
         {
             if (Client.Game.UO.Version >= ClientVersion.CV_706400)
             {
-                // Background
-                Add
-                (
-                    new GumpPicTiled
+                // Background - add support for animated wallpapers
+                if (Settings.GlobalSettings.LoginWallpaperAnimated)
+                {
+                    // Create animated background with multiple frames for a subtle animated effect
+                    // Using different gump IDs that exist in the client for visual variety
+                    ushort[] animFrames = new ushort[] { 0x0150, 0x0151, 0x0152, 0x0153 };
+                    Add
                     (
-                        0,
-                        0,
-                        640,
-                        480,
-                        0x0150
-                    ) { AcceptKeyboardInput = false }
-                );
+                        new AnimatedGumpPicTiled
+                        (
+                            0,
+                            0,
+                            640,
+                            480,
+                            animFrames,
+                            Settings.GlobalSettings.LoginWallpaperFrameDelay
+                        ) { AcceptKeyboardInput = false }
+                    );
+                }
+                else
+                {
+                    Add
+                    (
+                        new GumpPicTiled
+                        (
+                            0,
+                            0,
+                            640,
+                            480,
+                            0x0150
+                        ) { AcceptKeyboardInput = false }
+                    );
+                }
 
                 // UO Flag
                 Add(new GumpPic(0, 4, 0x0151, 0) { AcceptKeyboardInput = false });
             }
             else
             {
-                // Background
-                Add
-                (
-                    new GumpPicTiled
+                // Background - add support for animated wallpapers
+                if (Settings.GlobalSettings.LoginWallpaperAnimated)
+                {
+                    // Create animated background with multiple frames for a subtle animated effect
+                    // For older clients, use different background tiles for animation
+                    ushort[] animFrames = new ushort[] { 0x0E14, 0x0E16, 0x0E18, 0x0E1A };
+                    Add
                     (
-                        0,
-                        0,
-                        640,
-                        480,
-                        0x0E14
-                    ) { AcceptKeyboardInput = false }
-                );
+                        new AnimatedGumpPicTiled
+                        (
+                            0,
+                            0,
+                            640,
+                            480,
+                            animFrames,
+                            Settings.GlobalSettings.LoginWallpaperFrameDelay
+                        ) { AcceptKeyboardInput = false }
+                    );
+                }
+                else
+                {
+                    Add
+                    (
+                        new GumpPicTiled
+                        (
+                            0,
+                            0,
+                            640,
+                            480,
+                            0x0E14
+                        ) { AcceptKeyboardInput = false }
+                    );
+                }
 
                 // Border
                 Add(new GumpPic(0, 0, 0x157C, 0) { AcceptKeyboardInput = false });
