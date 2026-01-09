@@ -14,6 +14,14 @@ namespace ClassicUO.Game.UI.Controls
     /// </summary>
     internal class AnimatedGumpPicTiled : Control
     {
+        // Default background graphic ID for older UO clients
+        private const ushort DEFAULT_BACKGROUND_GRAPHIC = 0x0E14;
+        
+        // Animation constants for pulse effect
+        private const float PULSE_PERIOD_SECONDS = 5.0f;
+        private const float MIN_PULSE_ALPHA = 0.85f;
+        private const float MAX_PULSE_ALPHA = 1.0f;
+
         private readonly ushort[] _graphics;
         private int _currentFrame;
         private float _nextFrameTime;
@@ -30,7 +38,7 @@ namespace ClassicUO.Game.UI.Controls
         {
             CanMove = true;
             AcceptMouseInput = true;
-            _graphics = graphics ?? new ushort[] { 0x0E14 }; // Default to static background
+            _graphics = graphics ?? new ushort[] { DEFAULT_BACKGROUND_GRAPHIC };
             _currentFrame = 0;
             _frameDelay = frameDelayMs;
             _nextFrameTime = Time.Ticks + _frameDelay;
@@ -52,7 +60,7 @@ namespace ClassicUO.Game.UI.Controls
 
         private ushort CurrentGraphic => _graphics != null && _graphics.Length > 0 
             ? _graphics[_currentFrame % _graphics.Length] 
-            : (ushort)0x0E14;
+            : DEFAULT_BACKGROUND_GRAPHIC;
 
         private void UpdateGraphic()
         {
@@ -102,14 +110,12 @@ namespace ClassicUO.Game.UI.Controls
                 return Alpha;
 
             // Create a gentle pulsing effect using sine wave
-            // Pulse period is 5 seconds, oscillating between 85% and 100% alpha
-            float pulseValue = (float)Math.Sin(_pulseTime * Math.PI / 2.5f); // 5 second cycle
+            // The pulse period creates a smooth oscillation
+            float pulseValue = (float)Math.Sin(_pulseTime * Math.PI / (PULSE_PERIOD_SECONDS / 2.0f));
             float normalizedPulse = (pulseValue + 1f) / 2f; // Convert from [-1,1] to [0,1]
             
-            // Map to desired alpha range (0.85 to 1.0)
-            float minAlpha = 0.85f;
-            float maxAlpha = 1.0f;
-            return minAlpha + (normalizedPulse * (maxAlpha - minAlpha));
+            // Map to desired alpha range
+            return MIN_PULSE_ALPHA + (normalizedPulse * (MAX_PULSE_ALPHA - MIN_PULSE_ALPHA));
         }
 
         public override bool AddToRenderLists(RenderLists renderLists, int x, int y, ref float layerDepthRef)
