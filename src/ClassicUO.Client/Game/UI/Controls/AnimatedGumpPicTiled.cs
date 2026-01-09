@@ -4,11 +4,13 @@ using ClassicUO.Game.Scenes;
 using ClassicUO.Renderer;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace ClassicUO.Game.UI.Controls
 {
     /// <summary>
     /// An animated tiled background control that cycles through multiple gump graphics to create animated wallpaper effects.
+    /// Can also create pulsing effects by varying alpha/hue values.
     /// </summary>
     internal class AnimatedGumpPicTiled : Control
     {
@@ -16,6 +18,8 @@ namespace ClassicUO.Game.UI.Controls
         private int _currentFrame;
         private float _nextFrameTime;
         private readonly float _frameDelay;
+        private float _pulseTime;
+        private bool _enablePulseEffect = true;
 
         /// <summary>
         /// Creates an animated tiled background control.
@@ -30,6 +34,7 @@ namespace ClassicUO.Game.UI.Controls
             _currentFrame = 0;
             _frameDelay = frameDelayMs;
             _nextFrameTime = Time.Ticks + _frameDelay;
+            _pulseTime = 0f;
             
             UpdateGraphic();
         }
@@ -79,7 +84,10 @@ namespace ClassicUO.Game.UI.Controls
         {
             base.Update();
 
-            // Only animate if we have multiple frames
+            // Update pulse animation
+            _pulseTime += Time.Delta;
+
+            // Only cycle frames if we have multiple frames
             if (_graphics != null && _graphics.Length > 1 && Time.Ticks >= _nextFrameTime)
             {
                 _currentFrame = (_currentFrame + 1) % _graphics.Length;
@@ -88,10 +96,29 @@ namespace ClassicUO.Game.UI.Controls
             }
         }
 
+        private float GetPulseAlpha()
+        {
+            if (!_enablePulseEffect)
+                return Alpha;
+
+            // Create a gentle pulsing effect using sine wave
+            // Pulse period is 5 seconds, oscillating between 85% and 100% alpha
+            float pulseValue = (float)Math.Sin(_pulseTime * Math.PI / 2.5f); // 5 second cycle
+            float normalizedPulse = (pulseValue + 1f) / 2f; // Convert from [-1,1] to [0,1]
+            
+            // Map to desired alpha range (0.85 to 1.0)
+            float minAlpha = 0.85f;
+            float maxAlpha = 1.0f;
+            return minAlpha + (normalizedPulse * (maxAlpha - minAlpha));
+        }
+
         public override bool AddToRenderLists(RenderLists renderLists, int x, int y, ref float layerDepthRef)
         {
             float layerDepth = layerDepthRef;
-            Vector3 hueVector = ShaderHueTranslator.GetHueVector(Hue, false, Alpha, true);
+            
+            // Apply pulsing alpha effect for live wallpaper
+            float currentAlpha = GetPulseAlpha();
+            Vector3 hueVector = ShaderHueTranslator.GetHueVector(Hue, false, currentAlpha, true);
 
             ushort graphic = CurrentGraphic;
             ref readonly var gumpInfo = ref Client.Game.UO.Gumps.GetGump(graphic);

@@ -15,9 +15,9 @@ namespace ClassicUO.Game.UI.Gumps.Login
                 // Background - add support for animated wallpapers
                 if (Settings.GlobalSettings.LoginWallpaperAnimated)
                 {
-                    // Create animated background with multiple frames for a subtle animated effect
-                    // Using different gump IDs that exist in the client for visual variety
-                    ushort[] animFrames = new ushort[] { 0x0150, 0x0151, 0x0152, 0x0153 };
+                    // Create animated background with a subtle pulsing effect using the same graphic
+                    // This creates a "live" feel by cycling through frames
+                    ushort[] animFrames = new ushort[] { 0x0150 };
                     Add
                     (
                         new AnimatedGumpPicTiled
@@ -54,9 +54,8 @@ namespace ClassicUO.Game.UI.Gumps.Login
                 // Background - add support for animated wallpapers
                 if (Settings.GlobalSettings.LoginWallpaperAnimated)
                 {
-                    // Create animated background with multiple frames for a subtle animated effect
-                    // For older clients, use different background tiles for animation
-                    ushort[] animFrames = new ushort[] { 0x0E14, 0x0E16, 0x0E18, 0x0E1A };
+                    // Create animated background for older clients
+                    ushort[] animFrames = new ushort[] { 0x0E14 };
                     Add
                     (
                         new AnimatedGumpPicTiled
